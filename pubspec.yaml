@@ -10,7 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.6.0
+  http: ^1.2.2  # Ya lo tienes
+  shared_preferences: ^2.3.2  # NUEVO
 
 dev_dependencies:
   flutter_test:

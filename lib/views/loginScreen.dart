@@ -1,8 +1,7 @@
-// lib/views/loginScreen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_application_6/controllers/clientesController.dart';
 import 'package:flutter_application_6/views/menuPrincipal.dart';
-import 'package:flutter_application_6/views/registerScreen.dart'; // ← Correcto
+import 'package:flutter_application_6/views/registerScreen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,7 +11,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // Paleta de colores
   final Color fondo = const Color(0xFFAFDDFF);
   final Color encabezado = const Color(0xFF60B5FF);
   final Color campos = const Color(0xFFFFECDB);
@@ -41,6 +39,16 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
+    if (!correo.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Correo inválido"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     final result = await clientesService.loginCliente(correo, password);
@@ -48,6 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = false);
 
     if (result['success'] == true && result.containsKey('cliente')) {
+      await clientesService.guardarUsuario(result['cliente']);
+
       final nombre = result['cliente']['nombre'] ?? 'Usuario';
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -58,7 +68,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
 
-      // Pequeña pausa para que se vea el mensaje
       await Future.delayed(const Duration(seconds: 2));
 
       if (mounted) {
@@ -102,18 +111,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: encabezado,
+                    color: texto,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  "Inicia sesión para alquilar tu vehículo",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: texto.withOpacity(0.8)),
-                ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 40),
 
-                // Campo correo
                 TextField(
                   controller: correoController,
                   keyboardType: TextInputType.emailAddress,
@@ -131,7 +133,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Campo contraseña
                 TextField(
                   controller: passwordController,
                   obscureText: true,
@@ -149,7 +150,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 30),
 
-                // Botón iniciar sesión
                 SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -171,7 +171,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 40),
 
-                // ¿No tienes cuenta?
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

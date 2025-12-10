@@ -1,5 +1,3 @@
-// lib/views/perfilScreen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_6/controllers/clientesController.dart';
 import 'package:flutter_application_6/views/loginScreen.dart';
@@ -59,7 +57,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // Foto de perfil grande
             const CircleAvatar(
               radius: 70,
               backgroundColor: Colors.white,
@@ -67,7 +64,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Nombre grande
             Text(
               usuario['nombre'] ?? 'Cargando...',
               style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF222222)),
@@ -78,16 +74,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
             ),
             const SizedBox(height: 40),
 
-            // Tarjetas de información
             _infoCard(Icons.person_outline, "Nombre completo", usuario['nombre'] ?? '-'),
-            _infoCard(Icons.credit_card, "Cédula", usuario['cedula'] ?? 'No registrada'),
-            _infoCard(Icons.cake, "Fecha de nacimiento", usuario['fechaNacimiento'] ?? 'No registrada'),
             _infoCard(Icons.badge, "Número de licencia", usuario['numLic'] ?? '-'),
             _infoCard(Icons.email_outlined, "Correo", usuario['correo'] ?? '-'),
 
             const SizedBox(height: 50),
 
-            // Botón cerrar sesión
             SizedBox(
               width: double.infinity,
               height: 56,

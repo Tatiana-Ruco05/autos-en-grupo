@@ -1,9 +1,6 @@
-// lib/views/menuPrincipal.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_6/views/detalleVehiculo.dart';
-import 'package:flutter_application_6/views/perfilScreen.dart'; // ← NUEVA PANTALLA
-// import 'package:flutter_application_6/views/menuDrawerPerfil.dart'; // ← puedes dejarlo o borrarlo
+import 'package:flutter_application_6/views/perfilScreen.dart';
 
 class MenuPrincipal extends StatefulWidget {
   const MenuPrincipal({super.key});
@@ -13,20 +10,18 @@ class MenuPrincipal extends StatefulWidget {
 }
 
 class _MenuPrincipalState extends State<MenuPrincipal> {
-  int _selectedIndex = 0; // para controlar el bottom bar
+  int _selectedIndex = 0;
 
-  // Paleta de colores
   final Color fondo = const Color(0xFFAFDDFF);
   final Color encabezado = const Color(0xFF60B5FF);
   final Color campos = const Color(0xFFFFECDB);
   final Color boton = const Color(0xFFFF9149);
   final Color texto = const Color(0xFF222222);
 
-  // Tus pantallas del bottom bar
   static final List<Widget> _pantallas = [
-    const HomeConCarros(),           // ← Tu lista actual de carros
-    const MisAlquileresScreen(),     // ← Puedes hacer esta pantalla después
-    const PerfilScreen(),            // ← AQUÍ VA EL PERFIL DIRECTO
+    const HomeConCarros(),
+    const MisAlquileresScreen(),
+    const PerfilScreen(),
   ];
 
   void _onTabTapped(int index) {
@@ -39,7 +34,6 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: fondo,
-      // drawer: const MenuDrawerPerfil(), // ← si quieres mantener el drawer lateral, descomenta esta línea
       appBar: AppBar(
         title: const Text('Alquiler de Vehículos'),
         backgroundColor: encabezado,
@@ -63,83 +57,62 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
   }
 }
 
-// ===============================================
-// TU LISTA DE CARROS (exactamente como la tenías)
-// ===============================================
 class HomeConCarros extends StatelessWidget {
   const HomeConCarros({super.key});
 
   final Color campos = const Color(0xFFFFECDB);
-  final Color encabezado = const Color(0xFF60B5FF);
-  final Color texto = const Color(0xFF222222);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          // Buscador
-          TextField(
-            style: TextStyle(color: texto),
-            decoration: InputDecoration(
-              prefixIcon: Icon(Icons.search, color: encabezado),
-              hintText: 'Buscar vehículo',
-              hintStyle: TextStyle(color: texto.withOpacity(0.7)),
-              filled: true,
-              fillColor: campos,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Lista de vehículos
-          Expanded(
-            child: ListView.builder(
-              itemCount: listaDeAutos.length,
-              itemBuilder: (context, index) {
-                final auto = listaDeAutos[index];
-                return Card(
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  child: ListTile(
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(auto['imageUrl'], width: 60, height: 60, fit: BoxFit.cover),
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          'Vehículos disponibles',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: const Color(0xFF222222)),
+        ),
+        const SizedBox(height: 16),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: listaDeAutos.length,
+          itemBuilder: (context, index) {
+            final auto = listaDeAutos[index];
+            return Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: ListTile(
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(auto['imageUrl'], width: 60, height: 60, fit: BoxFit.cover),
+                ),
+                title: Text('${auto['marca']} ${auto['modelo']}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: Text('Año: ${auto['anio']}  •  Precio: \$${auto['precio']}'),
+                trailing: const Icon(Icons.arrow_forward_ios, color: Color(0xFFFF9149)),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetalleVehiculoScreen(
+                        imageUrl: auto['imageUrl'],
+                        marca: auto['marca'],
+                        modelo: auto['modelo'],
+                        anio: auto['anio'],
+                        disponibilidad: auto['disponibilidad'],
+                        precio: auto['precio'],
+                      ),
                     ),
-                    title: Text('${auto['marca']} ${auto['modelo']}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                    subtitle: Text('Año: ${auto['anio']}  •  Precio: \$${auto['precio']}'),
-                    trailing: const Icon(Icons.arrow_forward_ios, color: Color(0xFFFF9149)),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetalleVehiculoScreen(
-                            imageUrl: auto['imageUrl'],
-                            marca: auto['marca'],
-                            modelo: auto['modelo'],
-                            anio: auto['anio'],
-                            disponibilidad: auto['disponibilidad'],
-                            precio: auto['precio'],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }
 
-// Pantalla temporal para "Alquiler" (puedes mejorarla después)
 class MisAlquileresScreen extends StatelessWidget {
   const MisAlquileresScreen({super.key});
   @override
@@ -154,9 +127,6 @@ class MisAlquileresScreen extends StatelessWidget {
   }
 }
 
-// ===============================================
-// TUS DATOS DE EJEMPLO (NO TOCAR)
-// ===============================================
 final List<Map<String, dynamic>> listaDeAutos = [
   {
     "imageUrl": "https://picsum.photos/330/200",
@@ -174,7 +144,102 @@ final List<Map<String, dynamic>> listaDeAutos = [
     "disponibilidad": false,
     "precio": 14000
   },
-  // ... (el resto de tus 15 carros)
+  {
+    "imageUrl": "https://picsum.photos/330/200",
+    "marca": "Ford",
+    "modelo": "Mustang",
+    "anio": 2021,
+    "disponibilidad": true,
+    "precio": 25000
+  },
+  {
+    "imageUrl": "https://picsum.photos/330/200",
+    "marca": "Chevrolet",
+    "modelo": "Camaro",
+    "anio": 2022,
+    "disponibilidad": true,
+    "precio": 22000
+  },
+  {
+    "imageUrl": "https://picsum.photos/330/200",
+    "marca": "Volkswagen",
+    "modelo": "Golf",
+    "anio": 2018,
+    "disponibilidad": false,
+    "precio": 13000
+  },
+  {
+    "imageUrl": "https://picsum.photos/330/200",
+    "marca": "BMW",
+    "modelo": "3 Series",
+    "anio": 2023,
+    "disponibilidad": true,
+    "precio": 30000
+  },
+  {
+    "imageUrl": "https://picsum.photos/330/200",
+    "marca": "Mercedes",
+    "modelo": "C-Class",
+    "anio": 2020,
+    "disponibilidad": true,
+    "precio": 28000
+  },
+  {
+    "imageUrl": "https://picsum.photos/330/200",
+    "marca": "Audi",
+    "modelo": "A4",
+    "anio": 2019,
+    "disponibilidad": false,
+    "precio": 26000
+  },
+  {
+    "imageUrl": "https://picsum.photos/330/200",
+    "marca": "Nissan",
+    "modelo": "Altima",
+    "anio": 2021,
+    "disponibilidad": true,
+    "precio": 16000
+  },
+  {
+    "imageUrl": "https://picsum.photos/330/200",
+    "marca": "Hyundai",
+    "modelo": "Elantra",
+    "anio": 2022,
+    "disponibilidad": true,
+    "precio": 14000
+  },
+  {
+    "imageUrl": "https://picsum.photos/330/200",
+    "marca": "Kia",
+    "modelo": "Forte",
+    "anio": 2020,
+    "disponibilidad": false,
+    "precio": 13000
+  },
+  {
+    "imageUrl": "https://picsum.photos/330/200",
+    "marca": "Subaru",
+    "modelo": "Impreza",
+    "anio": 2019,
+    "disponibilidad": true,
+    "precio": 17000
+  },
+  {
+    "imageUrl": "https://picsum.photos/330/200",
+    "marca": "Mazda",
+    "modelo": "3",
+    "anio": 2021,
+    "disponibilidad": true,
+    "precio": 15000
+  },
+  {
+    "imageUrl": "https://picsum.photos/330/200",
+    "marca": "Tesla",
+    "modelo": "Model 3",
+    "anio": 2023,
+    "disponibilidad": false,
+    "precio": 35000
+  },
   {
     "imageUrl": "https://picsum.photos/330/200",
     "marca": "Renault",

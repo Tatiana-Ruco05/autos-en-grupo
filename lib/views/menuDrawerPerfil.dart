@@ -1,5 +1,3 @@
-// lib/views/menuDrawerPerfil.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_6/controllers/clientesController.dart';
 import 'package:flutter_application_6/views/loginScreen.dart';
@@ -12,11 +10,9 @@ class MenuDrawerPerfil extends StatefulWidget {
 }
 
 class _MenuDrawerPerfilState extends State<MenuDrawerPerfil> {
-  // Datos del usuario (se cargan al iniciar)
   Map<String, String> usuario = {};
   final TextEditingController _rentalController = TextEditingController();
 
-  // Paleta de colores (igual que siempre)
   final Color fondo = const Color(0xFFAFDDFF);
   final Color encabezado = const Color(0xFF60B5FF);
   final Color campos = const Color(0xFFFFECDB);
@@ -62,7 +58,6 @@ class _MenuDrawerPerfilState extends State<MenuDrawerPerfil> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          // ENCABEZADO CON FOTO Y NOMBRE
           DrawerHeader(
             decoration: const BoxDecoration(color: Color(0xFF60B5FF)),
             child: Column(
@@ -89,15 +84,11 @@ class _MenuDrawerPerfilState extends State<MenuDrawerPerfil> {
             ),
           ),
 
-          // DATOS DEL PERFIL
           _itemPerfil(Icons.person, "Nombre", usuario['nombre'] ?? '-'),
-          _itemPerfil(Icons.credit_card, "Cédula", usuario['cedula'] ?? 'No registrada'),
-          _itemPerfil(Icons.cake, "Fecha nacimiento", usuario['fechaNacimiento'] ?? 'No registrada'),
           _itemPerfil(Icons.badge, "Licencia", usuario['numLic'] ?? '-'),
 
           const Divider(height: 40, thickness: 1),
 
-          // BUSCADOR DE ALQUILERES (te lo dejo porque te gusta)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: TextField(
@@ -138,7 +129,6 @@ class _MenuDrawerPerfilState extends State<MenuDrawerPerfil> {
 
           const SizedBox(height: 30),
 
-          // CERRAR SESIÓN (AHORA SÍ FUNCIONA)
           ListTile(
             leading: Icon(Icons.exit_to_app, color: Colors.red),
             title: const Text(

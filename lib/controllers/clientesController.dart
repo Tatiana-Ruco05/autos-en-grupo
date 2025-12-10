@@ -1,12 +1,11 @@
-// lib/controllers/clientesController.dart
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ClientesService {
   static const String baseUrl = 'https://autos-03-12.onrender.com/api/clientes';
 
-  Future<Map<String, dynamic>> resgistrarCliente(
+  Future<Map<String, dynamic>> registrarCliente(
     String nombre,
     String correo,
     String numLic,
@@ -41,7 +40,6 @@ class ClientesService {
     }
   }
 
- 
   Future<Map<String, dynamic>> loginCliente(
       String correo, String password) async {
     try {
@@ -63,12 +61,11 @@ class ClientesService {
 
       final data = jsonDecode(response.body);
 
-      // Tu backend responde con "mensaje": "Login exitoso"
       if (response.statusCode == 200 && data['mensaje'] == 'Login exitoso') {
         return {
           'success': true,
           'cliente': data['cliente'],
-          'token': data['token'], // útil para más adelante
+          'token': data['token'],
           'mensaje': data['mensaje'],
         };
       } else {
@@ -84,5 +81,26 @@ class ClientesService {
         'mensaje': 'Error de conexión',
       };
     }
+  }
+
+  Future<void> guardarUsuario(Map<String, dynamic> cliente) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('usuario_nombre', cliente['nombre'] ?? '');
+    await prefs.setString('usuario_correo', cliente['correo'] ?? '');
+    await prefs.setString('usuario_numLic', cliente['numLic'] ?? '');
+  }
+
+  static Future<Map<String, String>> obtenerUsuarioLogueado() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'nombre': prefs.getString('usuario_nombre') ?? 'Usuario',
+      'correo': prefs.getString('usuario_correo') ?? '',
+      'numLic': prefs.getString('usuario_numLic') ?? '',
+    };
+  }
+
+  static Future<void> cerrarSesion() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
   }
 }
