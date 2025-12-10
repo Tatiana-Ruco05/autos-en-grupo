@@ -1,20 +1,53 @@
+// lib/views/menuDrawerPerfil.dart
+
 import 'package:flutter/material.dart';
+import 'package:flutter_application_6/controllers/clientesController.dart';
+import 'package:flutter_application_6/views/loginScreen.dart';
 
 class MenuDrawerPerfil extends StatefulWidget {
+  const MenuDrawerPerfil({super.key});
+
   @override
-  _MenuDrawerPerfilState createState() => _MenuDrawerPerfilState();
+  State<MenuDrawerPerfil> createState() => _MenuDrawerPerfilState();
 }
 
 class _MenuDrawerPerfilState extends State<MenuDrawerPerfil> {
-  // Controlador para el campo de texto de revisión de alquileres
+  // Datos del usuario (se cargan al iniciar)
+  Map<String, String> usuario = {};
   final TextEditingController _rentalController = TextEditingController();
 
-  // 🎨 Paleta unificada
+  // Paleta de colores (igual que siempre)
   final Color fondo = const Color(0xFFAFDDFF);
   final Color encabezado = const Color(0xFF60B5FF);
   final Color campos = const Color(0xFFFFECDB);
   final Color boton = const Color(0xFFFF9149);
   final Color texto = const Color(0xFF222222);
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarDatosUsuario();
+  }
+
+  Future<void> _cargarDatosUsuario() async {
+    final datos = await ClientesService.obtenerUsuarioLogueado();
+    if (mounted) {
+      setState(() {
+        usuario = datos;
+      });
+    }
+  }
+
+  Future<void> _cerrarSesion() async {
+    await ClientesService.cerrarSesion();
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (route) => false,
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -26,135 +59,105 @@ class _MenuDrawerPerfilState extends State<MenuDrawerPerfil> {
   Widget build(BuildContext context) {
     return Drawer(
       backgroundColor: fondo,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            // Encabezado del perfil
-            Column(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          // ENCABEZADO CON FOTO Y NOMBRE
+          DrawerHeader(
+            decoration: const BoxDecoration(color: Color(0xFF60B5FF)),
+            child: Column(
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 45,
-                  backgroundImage: AssetImage('assets/profile_pic.jpg'),
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.person, size: 50, color: Color(0xFF60B5FF)),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  "Nombre de Usuario",
-                  style: TextStyle(
+                  usuario['nombre'] ?? 'Cargando...',
+                  style: const TextStyle(
+                    color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: texto,
                   ),
                 ),
-                const SizedBox(height: 4),
                 Text(
-                  "correo@ejemplo.com",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: texto.withOpacity(0.7),
-                  ),
+                  usuario['correo'] ?? '',
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+          ),
 
-            // Información del perfil
-            ListTile(
-              leading: Icon(Icons.badge, color: encabezado),
-              title: Text("Número de licencia",
-                  style: TextStyle(color: texto, fontWeight: FontWeight.w500)),
-              subtitle: Text("123456789",
-                  style: TextStyle(color: texto.withOpacity(0.8))),
-            ),
-            const Divider(),
+          // DATOS DEL PERFIL
+          _itemPerfil(Icons.person, "Nombre", usuario['nombre'] ?? '-'),
+          _itemPerfil(Icons.credit_card, "Cédula", usuario['cedula'] ?? 'No registrada'),
+          _itemPerfil(Icons.cake, "Fecha nacimiento", usuario['fechaNacimiento'] ?? 'No registrada'),
+          _itemPerfil(Icons.badge, "Licencia", usuario['numLic'] ?? '-'),
 
-            ListTile(
-              leading: Icon(Icons.lock, color: encabezado),
-              title: Text("Cambiar contraseña",
-                  style: TextStyle(color: texto, fontWeight: FontWeight.w500)),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Funcionalidad en desarrollo')),
-                );
-              },
-            ),
-            const Divider(),
+          const Divider(height: 40, thickness: 1),
 
-            ListTile(
-              leading: Icon(Icons.search_rounded, color: boton),
-              title: Text("Revisar Alquileres",
-                  style: TextStyle(color: texto, fontWeight: FontWeight.w500)),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Campo de texto
-            TextField(
+          // BUSCADOR DE ALQUILERES (te lo dejo porque te gusta)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: TextField(
               controller: _rentalController,
-              style: TextStyle(color: texto),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: campos,
-                labelText: 'Número de alquiler o placa',
-                labelStyle: TextStyle(color: texto),
+                labelText: 'Placa o número de alquiler',
                 prefixIcon: Icon(Icons.directions_car, color: encabezado),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+                  borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Botón buscar
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: boton,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: ElevatedButton.icon(
               onPressed: () {
-                final valor = _rentalController.text.trim();
-                if (valor.isEmpty) {
+                final texto = _rentalController.text.trim();
+                if (texto.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Ingrese un número o placa')),
+                    const SnackBar(content: Text('Ingresa placa o número')),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text('Buscando alquiler para: $valor...')),
+                    SnackBar(content: Text('Buscando: $texto...')),
                   );
                 }
               },
-              child: const Text(
-                'Buscar Alquiler',
-                style: TextStyle(fontSize: 16, color: Colors.white),
-              ),
+              icon: const Icon(Icons.search),
+              label: const Text('Buscar Alquiler'),
+              style: ElevatedButton.styleFrom(backgroundColor: boton),
             ),
+          ),
 
-            const SizedBox(height: 30),
+          const SizedBox(height: 30),
 
-            // Cerrar sesión
-            ListTile(
-              leading: Icon(Icons.exit_to_app, color: boton),
-              title: Text(
-                "Cerrar sesión",
-                style: TextStyle(
-                    color: texto, fontWeight: FontWeight.w600, fontSize: 16),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Sesión cerrada.')),
-                );
-              },
+          // CERRAR SESIÓN (AHORA SÍ FUNCIONA)
+          ListTile(
+            leading: Icon(Icons.exit_to_app, color: Colors.red),
+            title: const Text(
+              "Cerrar sesión",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
-          ],
-        ),
+            onTap: _cerrarSesion,
+          ),
+          const SizedBox(height: 20),
+        ],
       ),
+    );
+  }
+
+  Widget _itemPerfil(IconData icon, String titulo, String valor) {
+    return ListTile(
+      leading: Icon(icon, color: encabezado),
+      title: Text(titulo, style: const TextStyle(fontWeight: FontWeight.w500)),
+      subtitle: Text(valor, style: TextStyle(color: texto.withOpacity(0.8))),
     );
   }
 }
